@@ -1,6 +1,11 @@
-﻿namespace WindowsExt.Lib.SystemCommandShell
+﻿using System;
+
+namespace WindowsExt.Lib.SystemCommandShell
 {
-	public class MkLinkResult
+	public struct MkLinkResult
 	{
+		public Exception Exception;
+		public bool IsSuccessful;
+		public string FailedStep;
 	}
 }
