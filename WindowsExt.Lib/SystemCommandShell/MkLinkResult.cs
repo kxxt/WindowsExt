@@ -6,6 +6,6 @@ namespace WindowsExt.Lib.SystemCommandShell
 	{
 		public Exception Exception;
 		public bool IsSuccessful;
-		public string FailedStep;
+		public MkLinkFailedStep FailedStep;
 	}
 }

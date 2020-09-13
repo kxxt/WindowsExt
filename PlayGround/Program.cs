@@ -14,7 +14,8 @@ namespace PlayGround
 		static void Main(string[] args)
 		{
 			//TestEnumMkLinkParameter();
-			TestClassMkLink();
+			//TestClassMkLink();
+			TestClassMkLinkWrapper();
 			ReadLine();
 		}
 		static void PrintEnumInfo(MkLinkParameter para)
@@ -23,6 +24,26 @@ namespace PlayGround
 			WriteLine(para);
 			Write("value:");
 			WriteLine((int)(para));
+		}
+		static void TestClassMkLinkWrapper()
+		{
+			WriteLine("---- Test MkLinkWrapper Class ----");
+			var x = new MkLinkWrapper("A", true);
+			var y = new MkLinkWrapper("test.txt", true);
+			var z = new MkLinkWrapper("HHH", false);
+			x.MkLinkTo("B", true).PrintMkLinkResult();
+			ReadKey();
+			x.MoveAndMkLinkHere("C", true).PrintMkLinkResult();
+			ReadKey();
+			y.MkLinkTo("testyyy.txt", true).PrintMkLinkResult();
+			ReadKey();
+			y.MoveAndMkLinkHere("HAHAHA.txt", true).PrintMkLinkResult();
+			ReadKey();
+			z.MkLinkHere("A", false).PrintMkLinkResult();
+			ReadKey();
+			z.Initialize("KKK", false);
+			z.MkLinkHere("test.txt", false).PrintMkLinkResult();
+
 		}
 		static void PrintMkLinkResult(this MkLinkResult r)
 		{

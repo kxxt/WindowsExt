@@ -18,17 +18,51 @@ namespace WindowsExt.Lib.SystemCommandShell
 			var lnkV = ValidateLink(link,overwriteExistedFile);
 			if (lnkV.Item1 != null)
 			{
-				return new MkLinkResult() { IsSuccessful = false, Exception = lnkV.Item1, FailedStep = "Validate Link" };
+				return new MkLinkResult() { IsSuccessful = false, Exception = lnkV.Item1, FailedStep = MkLinkFailedStep.ValidateLink };
 			}
 			var tarV = ValidateTarget(target);
 			if (tarV.Item1 != null)
 			{
-				return new MkLinkResult() { IsSuccessful = false, Exception = tarV.Item1, FailedStep = "Validate Target" };
+				return new MkLinkResult() { IsSuccessful = false, Exception = tarV.Item1, FailedStep = MkLinkFailedStep.ValidateTarget };
 			}
 			var paVal = ValidateParameter(para, tarV.Item3);
 			if (paVal != null)
 			{
-				return new MkLinkResult() { IsSuccessful = false, Exception = paVal, FailedStep = "Validate Parameter" };
+				return new MkLinkResult() { IsSuccessful = false, Exception = paVal, FailedStep = MkLinkFailedStep.ValidateParameter};
+			}
+			if (overwriteExistedFile)
+			{
+				if (File.Exists(link))
+				{
+					try
+					{
+						File.Delete(link);
+					}
+					catch(Exception ex)
+					{
+						return new MkLinkResult() { IsSuccessful = false, Exception = ex, FailedStep = MkLinkFailedStep.DeleteExistedFile };
+					}
+				}
+				if (Directory.Exists(link))
+				{
+					try
+					{
+						DirectoryInfo di = new DirectoryInfo(link);
+						foreach(var fi in di.GetFiles())
+						{
+							fi.Delete();
+						}
+						foreach (var dii in di.GetDirectories())
+						{
+							dii.Delete(true);
+						}
+						Directory.Delete(link);
+					}
+					catch (Exception ex)
+					{
+						return new MkLinkResult() { IsSuccessful = false, Exception = ex, FailedStep = MkLinkFailedStep.DeleteExistedFile };
+					}
+				}
 			}
 			_mkLinkCommand.Arguments = GenerateArguments(lnkV.Item2, tarV.Item2, para);
 			Process p;
@@ -39,10 +73,10 @@ namespace WindowsExt.Lib.SystemCommandShell
 			}
 			catch (Exception e)
 			{
-				return new MkLinkResult() { IsSuccessful = false, Exception = e, FailedStep = "Start Mklink Or Wait for its exit" };
+				return new MkLinkResult() { IsSuccessful = false, Exception = e, FailedStep =MkLinkFailedStep.StartMkLinkAndWaitForExit };
 			}
-			if (p.ExitCode == 0) return new MkLinkResult() { IsSuccessful = true, Exception = null, FailedStep = null };
-			return new MkLinkResult() { IsSuccessful = false,Exception=new Exception($"MkLink utility exited with code {p.ExitCode} (Not Zero).") ,FailedStep="Validate Exit Code"};
+			if (p.ExitCode == 0) return new MkLinkResult() { IsSuccessful = true, Exception = null, FailedStep = MkLinkFailedStep.None };
+			return new MkLinkResult() { IsSuccessful = false,Exception=new Exception($"MkLink utility exited with code {p.ExitCode} (Not Zero).") ,FailedStep=MkLinkFailedStep.CheckExitCode};
 		}
 		/// <summary>
 		/// 
